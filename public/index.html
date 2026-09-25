@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex Stream · 直播字幕控制台</title>
+  <meta name="description" content="选择 Codex 任务，将回答同步到 OBS 透明字幕。">
+  <link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script>
+</head>
+<body>
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M14 3h7v7m0-7L10 14M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5.5 7a7.5 7.5 0 0 1 12.2-2L20 8M4 16l2.3 3A7.5 7.5 0 0 0 18.5 17"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-4.5a9 9 0 0 1-.9-4A8.5 8.5 0 1 1 20 11.5Z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-clear" viewBox="0 0 24 24"><path d="m15 4 6 6-9 10H6l-4-4L15 4ZM10 9l6 6M11 20h11"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 10v4m4-7v10m5-14v18m5-14v10m4-7v4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  </svg>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Codex Stream 首页"><span class="brand-icon"><svg><use href="#i-wave"/></svg></span><span>Codex <strong>Stream</strong><span class="brand-tag">直播字幕</span></span></a>
+    <div class="top-actions"><span id="connection" class="connection"><span class="status-dot"></span><span>连接中</span></span><a class="button secondary open-output" href="/overlay" target="_blank" rel="noopener"><svg><use href="#i-open"/></svg>打开输出页</a><button id="copy-top" class="button primary"><svg><use href="#i-copy"/></svg>复制 OBS 地址</button></div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="选择任务">
+      <div class="sidebar-title"><div><span class="eyebrow">SOURCE</span><h1>任务来源</h1></div><button id="refresh" class="icon-button" title="刷新任务" aria-label="刷新任务"><svg><use href="#i-refresh"/></svg></button></div>
+      <label class="search-box"><svg><use href="#i-search"/></svg><input id="search" type="search" placeholder="搜索任务名称" aria-label="搜索任务名称" autocomplete="off"></label>
+      <div class="list-heading"><span>本机任务</span><span id="thread-count">—</span></div>
+      <div id="thread-list" class="thread-list" aria-live="polite"><p class="list-empty">正在读取任务…</p></div>
+      <button id="load-more" class="button secondary load-more" hidden>加载更多</button>
+      <details class="manual-select"><summary>通过任务 ID 连接</summary><form id="manual-form"><label for="thread-id">任务 ID</label><input id="thread-id" placeholder="粘贴任务 ID" required><button class="button secondary" type="submit">连接任务</button></form></details>
+      <div class="sidebar-note"><span class="local-mark">本机运行</span><p>选择一个任务，回答将同步到字幕。切换任务会同时更新 OBS 输出。</p></div>
+    </aside>
+    <main class="main">
+      <section class="preview-section" aria-label="字幕预览">
+        <div class="section-head"><div><div class="eyebrow">LIVE CANVAS</div><h2>字幕预览 <span id="live-badge" class="badge neutral">等待选择</span></h2></div><div class="preview-actions"><button id="pause" class="button secondary" disabled><svg><use href="#i-pause"/></svg><span>暂停同步</span></button><button id="clear" class="button secondary" disabled><svg><use href="#i-clear"/></svg>清屏</button></div></div>
+        <div class="canvas-shell">
+          <div class="canvas-toolbar"><span class="canvas-caption"><span class="frame-corner">⌗</span> 输出画面</span><div class="background-chooser" role="group" aria-label="预览背景"><button class="background-swatch checker-swatch active" data-bg="checker" aria-label="棋盘背景" aria-pressed="true"></button><button class="background-swatch dark-swatch" data-bg="dark" aria-label="深色背景" aria-pressed="false"></button><button class="background-swatch light-swatch" data-bg="light" aria-label="浅色背景" aria-pressed="false"></button></div></div>
+          <div id="stage" class="stage" data-background="checker"><iframe id="preview" src="/overlay" title="OBS 字幕实时预览" tabindex="-1"></iframe><div id="preview-empty" class="preview-empty"><span class="empty-icon"><svg><use href="#i-wave"/></svg></span><h3>让 Codex 的回答出现在画面里</h3><p>从左侧选择一个任务，即可预览字幕。</p></div><span class="safe-area" aria-hidden="true"></span></div>
+          <div class="canvas-footer"><span>1280 × 720 <span class="footer-divider">/</span> 背景透明</span><span id="preview-count">0 条字幕</span></div>
+        </div>
+        <div class="source-strip"><svg><use href="#i-chat"/></svg><span id="selected-name">尚未选择任务</span><span id="sync-info" class="sync-info">按消息同步</span></div>
+        <div id="error-banner" class="error-banner" role="alert" hidden></div>
+      </section>
+      <div class="settings-grid">
+        <section class="settings-card" aria-labelledby="appearance-title">
+          <div class="card-head"><span class="step">01</span><h2 id="appearance-title">字幕样式</h2><button id="reset-style" class="text-button">重置</button></div>
+          <div class="style-options" role="group" aria-label="字幕样式"><button class="style-option active" data-theme="glass" aria-pressed="true"><span class="style-sample glass-sample">Aa<span>CODEX</span></span><span>聊天气泡</span></button><button class="style-option" data-theme="text" aria-pressed="false"><span class="style-sample text-sample">Aa<span>CODEX</span></span><span>纯字幕</span></button></div>
+          <div class="slider-field"><label for="font-size">字号 <output id="font-size-value" for="font-size">28 px</output></label><input id="font-size" type="range" min="18" max="56" value="28"></div>
+          <div class="slider-field"><label for="opacity">气泡不透明度 <output id="opacity-value" for="opacity">80%</output></label><input id="opacity" type="range" min="0" max="100" value="80"></div>
+          <div class="setting-row"><label for="max-messages">最多保留</label><select id="max-messages"><option value="1">1 条消息</option><option value="2">2 条消息</option><option value="3" selected>3 条消息</option><option value="4">4 条消息</option><option value="5">5 条消息</option></select></div>
+          <div class="setting-row"><span>强调色</span><div class="color-options" role="group" aria-label="字幕强调色"><button class="color-swatch active" data-color="#c4f578" aria-label="青柠色" aria-pressed="true"></button><button class="color-swatch" data-color="#8cb8ff" aria-label="天蓝色" aria-pressed="false"></button><button class="color-swatch" data-color="#e5b5ff" aria-label="浅紫色" aria-pressed="false"></button><button class="color-swatch" data-color="#ffffff" aria-label="白色" aria-pressed="false"></button><label class="custom-color" title="自定义强调色"><input id="accent" type="color" value="#c4f578" aria-label="自定义强调色"><span>自定</span></label></div></div>
+          <label class="setting-row toggle-row"><span>显示进度消息<small>同时显示执行过程中的文字更新</small></span><input id="show-progress" class="switch" type="checkbox" checked></label>
+          <label class="setting-row toggle-row"><span>显示 CODEX 标识</span><input id="show-label" class="switch" type="checkbox" checked></label>
+        </section>
+        <section class="settings-card obs-card" aria-labelledby="obs-title">
+          <div class="card-head"><span class="step">02</span><h2 id="obs-title">接入 OBS</h2><span class="browser-tag">浏览器源</span></div>
+          <p class="obs-description">把下面的地址添加到 OBS，字幕就会跟随当前任务更新。</p>
+          <label class="field-label" for="overlay-url">输出地址</label><div class="url-field"><input id="overlay-url" readonly aria-label="OBS 输出地址"><button id="copy-url" class="icon-button" aria-label="复制输出地址" title="复制输出地址"><svg><use href="#i-copy"/></svg></button></div>
+          <ol class="obs-steps"><li><span>1</span><p>在 OBS「来源」中添加<strong>浏览器</strong></p></li><li><span>2</span><p>粘贴地址，设置画面尺寸<strong>宽 1280 · 高 720</strong></p></li><li><span>3</span><p>在场景中拖动和缩放<strong>字幕背景会保持透明</strong></p></li></ol>
+          <div class="obs-note"><svg><use href="#i-wave"/></svg><p>控制台与 OBS 共用同一份设置。<br>调整样式后，无需重新添加来源。</p></div>
+          <details id="diagnostics" class="diagnostics"><summary>连接信息<svg><use href="#i-chevron"/></svg></summary><dl><div><dt>读取方式</dt><dd>只读会话快照 · 按消息更新</dd></div><div><dt>读取间隔</dt><dd id="poll-interval">1.8 秒</dd></div><div><dt>后端版本</dt><dd id="backend-version">检测中</dd></div></dl><p>字幕会在消息写入会话后更新。当前版本不提供逐字流式镜像。</p></details>
+        </section>
+      </div>
+      <footer class="page-footer"><span>CODEX STREAM HELPER</span><span>你的任务，你的直播画面。</span></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

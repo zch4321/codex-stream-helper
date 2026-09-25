@@ -1,0 +1,16 @@
+:root{color-scheme:dark;--font-size:28px;--accent:#c4f578;--panel-opacity:.8;font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:transparent!important;overflow:hidden}
+.captions{position:absolute;inset:auto 28px 28px;display:flex;flex-direction:column;gap:12px;max-height:calc(100% - 56px);align-items:flex-start;overflow:hidden;justify-content:flex-end}
+.caption{flex:0 1 auto;width:min(100%,900px);max-height:100%;min-height:0;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.13);border-left:3px solid var(--accent);background:rgba(15,19,25,var(--panel-opacity));border-radius:4px 14px 14px 4px;padding:20px 24px;color:#f5f7f9;box-shadow:0 4px 20px #0002;overflow:hidden;animation:arrive .25s ease-out}
+.caption:last-child{flex-shrink:0;max-height:calc(100vh - 56px)}
+.caption-label{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:14px;font-weight:650;letter-spacing:.1em;color:var(--accent);margin-bottom:10px;flex-shrink:0}
+.caption-profile{font-size:13px;font-weight:500;letter-spacing:0;color:#dce4e9}
+.caption-phase{font-size:12px;font-weight:450;letter-spacing:0;color:#c8cdd5}
+.caption-text{font-size:var(--font-size);font-weight:450;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;overflow:hidden;text-shadow:0 2px 4px #0007;margin:0;min-height:0}
+.caption-text code{font-family:"Cascadia Code",Consolas,monospace;font-size:.9em;background:#ffffff0d;padding:1px 4px;border-radius:3px}
+.caption-text strong{font-weight:700}.caption-code{display:block;white-space:pre-wrap;font-family:"Cascadia Code",Consolas,monospace;font-size:.85em;background:#0003;border-radius:6px;padding:10px;margin:8px 0}
+.captions[data-theme="text"] .caption{background:transparent;border:0;box-shadow:none;padding:8px 4px;border-radius:0}
+.captions[data-theme="text"] .caption-text{text-shadow:-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000,1px 1px 1px #000,0 3px 6px #000}
+@keyframes arrive{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.caption{animation:none}}
+@media(max-width:600px){.captions{inset:auto 16px 16px;max-height:calc(100% - 32px)}.caption{padding:14px 16px}.caption:last-child{max-height:calc(100vh - 32px)}}

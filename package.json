@@ -1,0 +1,13 @@
+{
+  "name": "codex-stream-helper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local, read-only Codex captions for OBS Browser Source",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}
